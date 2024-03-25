@@ -3,6 +3,6 @@ module.exports = function apiMiddleWare(req, res, next) {
     !req.headers["authorization"] ||
     req.headers["authorization"] != process.env.AUTH_KEY
   )
-    return res.status(405).send({ error: "Forbidden access" });
+    return res.status(403).send({ error: "Forbidden access" });
   else next();
 };
