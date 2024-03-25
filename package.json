@@ -14,5 +14,8 @@
     "dev": "nodemon node ."
   },
   "author": "Lefter",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "cors": "^2.8.5"
+  }
 }
