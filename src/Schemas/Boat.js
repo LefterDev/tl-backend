@@ -13,6 +13,10 @@ const BoatSchema = new Schema({
     type: Number,
     required: true,
   },
+  url_name: {
+    type: String,
+    required: true,
+  },
 });
 
 const Boat = model("Boats", BoatSchema, "Boats");

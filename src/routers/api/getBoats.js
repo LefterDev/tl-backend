@@ -5,7 +5,7 @@ const getBoatRouter = Router();
 
 getBoatRouter.get("/", async (req, res) => {
   const getDbEntries = await Boat.find({});
-  res.json(getDbEntries);
+  return res.send(getDbEntries);
 });
 
 module.exports = getBoatRouter;
