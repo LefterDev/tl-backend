@@ -17,6 +17,10 @@ const BoatSchema = new Schema({
     type: String,
     required: true,
   },
+  image_url: {
+    type: String,
+    required: true,
+  },
 });
 
 const Boat = model("Boats", BoatSchema, "Boats");
