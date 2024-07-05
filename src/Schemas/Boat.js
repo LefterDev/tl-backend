@@ -21,6 +21,10 @@ const BoatSchema = new Schema({
     type: String,
     required: true,
   },
+  carousel_images: {
+    type: Array,
+    required: true
+  }
 });
 
 const Boat = model("Boats", BoatSchema, "Boats");

@@ -1,6 +1,6 @@
 const { Router } = require("express");
 const getBoatsRouter = require("./api/getBoats");
-const getBoatRouter = require("./api/getBoat")
+const getBoatRouter = require("./api/getBoat");
 const postBoatApi = require("./api/postBoat");
 const apiMiddleWare = require("../middleware/apiMiddleware");
 
