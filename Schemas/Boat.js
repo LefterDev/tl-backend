@@ -23,8 +23,8 @@ const BoatSchema = new Schema({
   },
   carousel_images: {
     type: Array,
-    required: true
-  }
+    required: true,
+  },
 });
 
 const Boat = model("Boats", BoatSchema, "Boats");
