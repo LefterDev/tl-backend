@@ -29,16 +29,17 @@ app.post("/.netlify/functions/api/book-boat", async (req, res) => {
   const boat = req.query.url_name;
   const startDate = req.body.start_date;
   const toDate = req.body.toDate;
-  new Booking({
+  const booking = new Booking({
     first_name: req.body.first_name,
     last_name: req.body.last_name,
     payment_method: req.body.payment_method,
     boat_booked: req.query.url_name,
     people: req.body.people,
     skipper: req.body.skipper,
-    bookDate: startDate,
-    endBookDate: toDate,
-  }).save();
+    bookDate: new Date(startDate),
+    endBookDate: new Date(toDate),
+  });
+
   await Boat.updateOne(
     { url_name: boat },
     { $push: { bookDates: [`${startDate} - ${toDate}`] } }
@@ -46,7 +47,7 @@ app.post("/.netlify/functions/api/book-boat", async (req, res) => {
     res.send({
       message: `Booking for ${boat} from ${startDate} to ${toDate} was made successfully`,
     });
-    console.log(`Booked ${boat}. start: ${startDate}. end: ${toDate}`);
+    booking.save();
     return;
   });
 });
