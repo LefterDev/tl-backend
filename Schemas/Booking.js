@@ -21,10 +21,9 @@ const BookingSchema = new Schema({
     required: true,
     default: " ",
   },
-  people: {
-    type: Number,
+  phone_number: {
+    type: String,
     required: true,
-    default: 1,
   },
   skipper: {
     type: Boolean,

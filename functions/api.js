@@ -7,10 +7,10 @@ import cors from "cors";
 import { json } from "body-parser";
 import { authenticationMiddleWare } from "../middleware/authentication";
 import Booking from "../Schemas/Booking";
+import { bookedDate, validateDate } from "../utilities/dateValidation";
+import { validatePaymentMethod } from "../utilities/paymentMethodValidation";
 const app = express();
-connect(
-  "mongodb+srv://lefter:lekais09@travel-agency.zmvnrxx.mongodb.net/travel-agency"
-).then(() => console.log("DB connected"));
+connect(process.env.MONGODB_URI).then(() => console.log("DB connected"));
 
 app.use(cors());
 app.use(json());
@@ -27,24 +27,33 @@ app.get("/.netlify/functions/api/get-boat", async (req, res) => {
 
 app.post("/.netlify/functions/api/book-boat", async (req, res) => {
   const boat = req.query.url_name;
-  const startDate = req.body.start_date;
-  const toDate = req.body.toDate;
+  const startDate = new Date(req.body.start_date);
+  const toDate = new Date(req.body.toDate);
+  const payment_method = req.body.payment_method;
+  const phone_number = req.body.phone_number;
+  if (!validatePaymentMethod(payment_method))
+    return res.status(500).send({ error: "Invalid payment method" });
+  if (!validateDate(startDate.getTime(), toDate.getTime()))
+    return res.status(500).send({ error: "Invalid Date" });
+  if (bookedDate(startDate.getTime()))
+    return res.status(500).send({ error: "Date already booked" });
+
   const booking = new Booking({
     first_name: req.body.first_name,
     last_name: req.body.last_name,
-    payment_method: req.body.payment_method,
+    payment_method: payment_method,
     boat_booked: req.query.url_name,
-    people: req.body.people,
+    phone_number: phone_number,
     skipper: req.body.skipper,
-    bookDate: new Date(startDate),
-    endBookDate: new Date(toDate),
+    bookDate: startDate,
+    endBookDate: toDate,
   });
 
   await Boat.updateOne(
     { url_name: boat },
     { $push: { bookDates: [`${startDate} - ${toDate}`] } }
   ).then(() => {
-    res.send({
+    res.status(200).send({
       message: `Booking for ${boat} from ${startDate} to ${toDate} was made successfully`,
     });
     booking.save();
