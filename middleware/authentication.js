@@ -1,4 +1,4 @@
-export const authenticationMiddleWare = (req, res, next) => {
+const authenticationMiddleWare = (req, res, next) => {
   const key = process.env.SECRET_KEY;
   const header = req.headers["authorization"];
 
@@ -6,3 +6,4 @@ export const authenticationMiddleWare = (req, res, next) => {
     return res.status(403).send({ error: "Access Forbidden" });
   else next();
 };
+module.exports = { authenticationMiddleWare };

@@ -25,10 +25,6 @@ const BoatSchema = new Schema({
     type: Array,
     required: true,
   },
-  bookDates: {
-    type: Array,
-    default: [],
-  },
 });
 
 const Boat = model("Boats", BoatSchema, "Boats");
