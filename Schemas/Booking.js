@@ -11,6 +11,10 @@ const BookingSchema = new Schema({
     required: true,
     default: " ",
   },
+  email: {
+    type: String,
+    required: true,
+  },
   payment_method: {
     type: String,
     required: true,
@@ -24,6 +28,11 @@ const BookingSchema = new Schema({
   phone_number: {
     type: String,
     required: true,
+  },
+  remarks: {
+    type: String,
+    required: true,
+    default: " ",
   },
   skipper: {
     type: Boolean,
