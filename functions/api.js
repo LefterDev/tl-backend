@@ -27,36 +27,45 @@ app.get("/api/get-boat", async (req, res) => {
 });
 
 app.post("/api/book-boat", async (req, res) => {
-  const boat = req.query.url_name;
-  const startDate = new Date(req.body.start_date);
-  const toDate = new Date(req.body.toDate);
-  const { payment_method, phone_number, remarks, first_name, last_name, email } = req.body;
+  const boat_url = req.query.url_name;
+
+  const {
+    payment_method,
+    phone_number,
+    remarks,
+    first_name,
+    last_name,
+    email,
+    startDate,
+    toDate,
+    boat,
+  } = req.body;
   // if (!validatePaymentMethod(payment_method))
   //   return res.status(500).send({ error: "Invalid payment method" });
-  if (!validateDate(startDate.getTime(), toDate.getTime()))
-    return res.status(500).send({ error: "Invalid Date" });
-  if (bookedDate(startDate.getTime()))
-    return res.status(500).send({ error: "Date already booked" });
+  // if (!validateDate(startDate.getTime(), toDate.getTime()))
+  //   return res.status(500).send({ error: "Invalid Date" });
+  // if (bookedDate(startDate.getTime()))
+  //   return res.status(500).send({ error: "Date already booked" });
 
   const booking = new Booking({
     first_name: first_name,
     last_name: last_name,
     email: email,
     // payment_method: payment_method,
-    boat_booked: boat,
+    boat_booked: boat.name,
     phone_number: phone_number,
     remarks: remarks,
     // skipper: req.body.skipper,
-    bookDate: startDate,
-    endBookDate: toDate,
+    bookDate: new Date(startDate),
+    endBookDate: new Date(toDate),
   });
 
   await Boat.updateOne(
-    { url_name: boat },
+    { url_name: boat_url },
     { $push: { bookDates: [`${startDate} - ${toDate}`] } }
   ).then(() => {
     res.status(200).send({
-      message: `Pre-booking for ${boat} from ${startDate} to ${toDate} was made successfully`,
+      message: `Pre-booking for ${boat.name} from ${startDate} to ${toDate} was made successfully`,
     });
     booking.save();
     return;
