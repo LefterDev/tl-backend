@@ -31,7 +31,6 @@ const BookingSchema = new Schema({
   },
   remarks: {
     type: String,
-    required: true,
     default: " ",
   },
   skipper: {
