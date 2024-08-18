@@ -7,10 +7,10 @@ import cors from "cors";
 import { json } from "body-parser";
 import { authenticationMiddleWare } from "../middleware/authentication";
 import Booking from "../Schemas/Booking";
-import { bookedDate, validateDate } from "../utilities/dateValidation";
-import { validatePaymentMethod } from "../utilities/paymentMethodValidation";
 const app = express();
-connect(process.env.MONGODB_URI).then(() => console.log("DB connected"));
+connect(
+  "mongodb+srv://lefter:lekais09@travel-agency.zmvnrxx.mongodb.net/travel-agency"
+).then(() => console.log("DB connected"));
 
 app.use(cors());
 app.use(json());
@@ -26,35 +26,45 @@ app.get("/.netlify/functions/api/get-boat", async (req, res) => {
 });
 
 app.post("/.netlify/functions/api/book-boat", async (req, res) => {
-  const boat = req.query.url_name;
-  const startDate = new Date(req.body.start_date);
-  const toDate = new Date(req.body.toDate);
-  const payment_method = req.body.payment_method;
-  const phone_number = req.body.phone_number;
-  if (!validatePaymentMethod(payment_method))
-    return res.status(500).send({ error: "Invalid payment method" });
-  if (!validateDate(startDate.getTime(), toDate.getTime()))
-    return res.status(500).send({ error: "Invalid Date" });
-  if (bookedDate(startDate.getTime()))
-    return res.status(500).send({ error: "Date already booked" });
+  const boat_url = req.query.url_name;
+
+  const {
+    payment_method,
+    phone_number,
+    remarks,
+    first_name,
+    last_name,
+    email,
+    startDate,
+    toDate,
+    boat,
+  } = req.body;
+  // if (!validatePaymentMethod(payment_method))
+  //   return res.status(500).send({ error: "Invalid payment method" });
+  // if (!validateDate(startDate.getTime(), toDate.getTime()))
+  //   return res.status(500).send({ error: "Invalid Date" });
+  // if (bookedDate(startDate.getTime()))
+  //   return res.status(500).send({ error: "Date already booked" });
 
   const booking = new Booking({
-    first_name: req.body.first_name,
-    last_name: req.body.last_name,
-    payment_method: payment_method,
-    boat_booked: req.query.url_name,
+    first_name: first_name,
+    last_name: last_name,
+    email: email,
+    // payment_method: payment_method,
+    boat_booked: boat.name,
     phone_number: phone_number,
-    skipper: req.body.skipper,
-    bookDate: startDate,
-    endBookDate: toDate,
+    remarks: remarks,
+    // skipper: req.body.skipper,
+    bookDate: new Date(startDate),
+    endBookDate: new Date(toDate),
   });
 
   await Boat.updateOne(
-    { url_name: boat },
+    { url_name: boat_url },
     { $push: { bookDates: [`${startDate} - ${toDate}`] } }
   ).then(() => {
     res.status(200).send({
-      message: `Booking for ${boat} from ${startDate} to ${toDate} was made successfully`,
+      message: `Pre-booking for ${boat.name} from ${startDate} to ${toDate} was made successfully`,
     });
     booking.save();
     return;
@@ -63,6 +73,19 @@ app.post("/.netlify/functions/api/book-boat", async (req, res) => {
 //TODO Add admin middleware here
 app.get("/.netlify/functions/api/bookings-admin", async (req, res) => {
   return res.send(await Booking.find({}));
+});
+
+app.get("/.netlify/functions/api/closed-dates", async (req, res) => {
+  const query = await Booking.find({});
+  if (query == null)
+    return res
+      .status(500)
+      .send({ error: "An error occured within the server" });
+  const bookDates = [];
+  for (const item of query) {
+    bookDates.push(`${item.bookDate} - ${item.endBookDate}`);
+  }
+  return res.status(200).send(bookDates);
 });
 
 const handler = ServerlessHttp(app);
